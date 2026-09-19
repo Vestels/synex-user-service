@@ -1,0 +1,21 @@
+{
+  "name": "synex-user-service",
+  "version": "0.1.2",
+  "private": true,
+  "scripts": {
+    "commit": "commit",
+    "prepare": "husky"
+  },
+  "engines": {
+    "pnpm": "^12.11.2"
+  },
+  "packageManager": "pnpm@12.11.2",
+  "devDependencies": {
+    "@changesets/changelog-github": "^1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@commitlint/prompt-cli": "^21.2.3",
+    "husky": "^9.1.7"
+  }
+}

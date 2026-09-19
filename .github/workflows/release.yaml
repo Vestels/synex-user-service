@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '26.11.1'
+          cache: pnpm
+
+      - name: Install release tooling
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release Pull Request or GitHub Release
+        id: changesets
+        uses: changesets/action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+          version-script: >-
+            node -e "const { execFileSync } = require('node:child_process');
+            execFileSync('pnpm', ['changeset', 'version'], { stdio: 'inherit' });
+            const version = require('./package.json').version;
+            execFileSync('./mvnw', ['versions:set', '-DnewVersion=' + version, '-DgenerateBackupPoms=false'], { stdio: 'inherit' });"
+
+          publish-script: >-
+            node -e "const fs = require('node:fs');
+            const { execFileSync } = require('node:child_process');
+            const pkg = require('./package.json');
+            let previous;
+            try {
+              const parent = execFileSync('git', ['rev-parse', 'HEAD^1'], { encoding: 'utf8' }).trim();
+              previous = JSON.parse(execFileSync('git', ['show', parent + ':package.json'], { encoding: 'utf8' }));
+            } catch {
+              console.log('No parent commit available; skipping release.');
+              process.exit(0);
+            }
+            if (previous.version === pkg.version) {
+              console.log('No version bump in this commit; skipping release.');
+              process.exit(0);
+            }
+            const tag = 'v' + pkg.version;
+            const tagExists = execFileSync('git', ['ls-remote', '--tags', 'origin', 'refs/tags/' + tag, 'refs/tags/' + tag + '^{}'], { encoding: 'utf8' }).trim().length > 0;
+            let releaseExists = false;
+            try {
+              execFileSync('gh', ['release', 'view', tag], { stdio: 'ignore' });
+              releaseExists = true;
+            } catch {}
+            if (tagExists || releaseExists) {
+              console.log('Release already exists; skipping ' + tag);
+              process.exit(0);
+            }
+            fs.appendFileSync(process.env.CHANGESETS_OUTPUT, JSON.stringify({ type: 'git-tag', tag, packageName: pkg.name }) + '\n');
+            console.log('Queued release: ' + tag);"
+
+          pr-title: 'chore(release): version packages'
+          commit-message: 'chore(release): version packages'
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HUSKY: '0'
+
+  sync-back-to-develop:
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+users.noreply.github.com"
+
+      - name: Merge main back to develop
+        run: |
+          git fetch origin main develop
+          git checkout develop
+          git pull --ff-only origin develop
+          git merge origin/main --no-edit -m "chore(sync): merge main back to develop [skip ci]"
+
+          VERSION=$(node -p "require('./package.json').version")
+          ./mvnw versions:set -DnewVersion="${VERSION}-SNAPSHOT" -DgenerateBackupPoms=false
+
+          git add .
+          git diff --cached --quiet || git commit -m "chore(develop): set version to ${VERSION}-SNAPSHOT"
+          git push origin develop
