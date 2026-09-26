@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - develop
+      - main
 
 permissions:
   contents: write
@@ -68,7 +68,7 @@ jobs:
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          ./mvnw versions:set -DnewVersion="$VERSION-SNAPSHOT" -DgenerateBackupPoms=false
+          ./mvnw versions:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
 
       - name: Commit version changes
         if: steps.changesets.outputs.has_changesets == 'true'
@@ -77,18 +77,18 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           git add .
-          git commit -m "chore(release): [ v${VERSION}-SNAPSHOT ]"
+          git commit -m "chore(release): [ v${VERSION} ]"
 
       - name: Create tag
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          git tag "v${VERSION}-SNAPSHOT"
+          git tag "v${VERSION}"
 
       - name: Push commit and tag
         if: steps.changesets.outputs.has_changesets == 'true'
         run: |
-          git push origin develop
+          git push origin main
           git push origin --tags
 
       - name: Create GitHub Release
@@ -97,6 +97,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
-          gh release create "v${VERSION}-SNAPSHOT" \
-            --title "v${VERSION}-SNAPSHOT" \
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
             --generate-notes
