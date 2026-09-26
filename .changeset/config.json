@@ -6,7 +6,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "Vestels/user-service",
+      "repo": "Vestels/synex-user-service",
       "disableThanks": true
     }
   ],

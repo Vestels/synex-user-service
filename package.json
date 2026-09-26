@@ -1,5 +1,5 @@
 {
-  "name": "user-service",
+  "name": "synex-user-service",
   "version": "0.1.1",
   "private": true,
   "scripts": {
