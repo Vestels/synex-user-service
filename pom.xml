@@ -8,11 +8,11 @@
         <version>4.1.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.fitnessapp</groupId>
-    <artifactId>user-service</artifactId>
+    <groupId>com.synex</groupId>
+    <artifactId>synex-user-service</artifactId>
     <version>0.1.1-SNAPSHOT</version>
-    <name>user-service</name>
-    <description>user-service</description>
+    <name>synex-user-service</name>
+    <description>User service for Synex application</description>
     <url/>
     <licenses>
         <license/>
@@ -108,6 +108,7 @@
     </dependencyManagement>
 
     <build>
+        <finalName>synex-user-service</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
