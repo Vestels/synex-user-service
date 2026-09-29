@@ -1,9 +1,7 @@
 package com.synex.synexuserservice.controller;
 
 import com.synex.synexuserservice.dto.response.UserResponseDto;
-import com.synex.synexuserservice.dto.security.Auth0UserResponseDto;
 import com.synex.synexuserservice.service.UserService;
-import com.synex.synexuserservice.service.support.Auth0UserInfoService;
 import com.synex.synexuserservice.service.support.AuthenticateService;
 import com.synex.synexuserservice.service.support.UserProvisioningService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ public class UserController {
 
     private final UserService userService;
     private final AuthenticateService authenticateService;
-    private final Auth0UserInfoService auth0UserInfoService;
     private final UserProvisioningService userProvisioningService;
 
     @GetMapping()
@@ -37,11 +34,5 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void clearUserScheduledDeletion(Authentication authentication) {
         userService.clearUserScheduledDeletion(authenticateService.requireAuthenticatedUserPublicId(authentication));
-    }
-
-    @GetMapping("/info")
-    @ResponseStatus(HttpStatus.OK)
-    public Auth0UserResponseDto getUserInfoData(Authentication authentication) {
-        return auth0UserInfoService.getUserInfoData(authentication);
     }
 }

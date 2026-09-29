@@ -1,6 +1,6 @@
 package com.synex.synexuserservice.service.support;
 
-import com.synex.synexuserservice.dto.security.AuthenticatedUserDto;
+import com.synex.synexuserservice.dto.security.AuthenticatedUserIdentityDto;
 import com.synex.synexuserservice.entity.UserEntity;
 import com.synex.synexuserservice.entity.UserIdentityEntity;
 import com.synex.synexuserservice.enums.IdentityProvider;
@@ -9,7 +9,6 @@ import com.synex.synexuserservice.service.UserIdentityService;
 import com.synex.synexuserservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -35,12 +34,8 @@ public class AuthenticateService {
         return getAuthenticatedUserPublicId(authentication).orElseThrow(() -> new UserIdentityNotFoundException("User identity not found."));
     }
 
-    public Jwt getJwtTokenFromPrincipal(Authentication authentication) {
-        return (Jwt) authentication.getPrincipal();
-    }
-
     public Optional<UserIdentityEntity> getAuthenticatedIdentity(Authentication authentication) {
-        AuthenticatedUserDto authenticatedUser = AuthenticatedUserDto.from(authentication);
+        AuthenticatedUserIdentityDto authenticatedUser = AuthenticatedUserIdentityDto.from(authentication);
 
         return userIdentityService.getAuthenticatedUserIdentityProvider(
                 IdentityProvider.valueOf(authenticatedUser.provider()),

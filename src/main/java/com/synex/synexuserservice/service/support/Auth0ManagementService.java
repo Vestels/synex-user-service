@@ -2,7 +2,6 @@ package com.synex.synexuserservice.service.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.synex.synexuserservice.config.Auth0ManagementProperties;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,7 +16,6 @@ public class Auth0ManagementService {
     private final Auth0ManagementProperties properties;
 
     public Auth0ManagementService(
-            @Qualifier("auth0ManagementRestClient")
             RestClient auth0ManagementRestClient,
             Auth0ManagementProperties properties
     ) {

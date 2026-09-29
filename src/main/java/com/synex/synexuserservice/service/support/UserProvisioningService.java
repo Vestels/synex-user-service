@@ -1,7 +1,7 @@
 package com.synex.synexuserservice.service.support;
 
 import com.synex.synexuserservice.dto.response.UserResponseDto;
-import com.synex.synexuserservice.dto.security.AuthenticatedUserDto;
+import com.synex.synexuserservice.dto.security.AuthenticatedUserIdentityDto;
 import com.synex.synexuserservice.entity.UserEntity;
 import com.synex.synexuserservice.entity.UserIdentityEntity;
 import com.synex.synexuserservice.entity.UserPreferencesEntity;
@@ -32,7 +32,7 @@ public class UserProvisioningService {
     @Transactional
     public UserResponseDto getOrProvisionUser(Authentication authentication) {
 
-        AuthenticatedUserDto authenticatedUser = AuthenticatedUserDto.from(authentication);
+        AuthenticatedUserIdentityDto authenticatedUser = AuthenticatedUserIdentityDto.from(authentication);
         UserIdentityEntity identity = authenticateService.getAuthenticatedIdentity(authentication).orElse(null);
 
         if (identity != null) {
