@@ -1,7 +1,6 @@
 package com.synex.synexuserservice.controller;
 
 import com.synex.synexuserservice.dto.response.UserIdentityResponseDto;
-import com.synex.synexuserservice.entity.UserEntity;
 import com.synex.synexuserservice.service.UserIdentityService;
 import com.synex.synexuserservice.service.support.AuthenticateService;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +24,6 @@ public class UserIdentityController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<UserIdentityResponseDto> getAllUserIdentities(Authentication authentication) {
-        UserEntity user = authenticateService.getUserByAuthenticatedIdentity(authentication);
-
-        return userIdentityService.getAllUserIdentities(user.getPublicId());
+        return userIdentityService.getAllUserIdentities(authenticateService.getUserByAuthenticatedIdentity(authentication).getPublicId());
     }
 }

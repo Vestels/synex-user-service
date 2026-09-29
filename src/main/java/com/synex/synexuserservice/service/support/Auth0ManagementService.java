@@ -2,26 +2,21 @@ package com.synex.synexuserservice.service.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.synex.synexuserservice.config.Auth0ManagementProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.util.Map;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class Auth0ManagementService {
 
     private final RestClient auth0ManagementRestClient;
     private final Auth0ManagementProperties properties;
-
-    public Auth0ManagementService(
-            RestClient auth0ManagementRestClient,
-            Auth0ManagementProperties properties
-    ) {
-        this.auth0ManagementRestClient = auth0ManagementRestClient;
-        this.properties = properties;
-    }
 
     public boolean userExists(String auth0UserId) {
         try {
@@ -53,12 +48,12 @@ public class Auth0ManagementService {
                         .post()
                         .uri("/oauth/token")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .body(
-                                "grant_type=client_credentials" +
-                                        "&client_id=" + properties.getClientId() +
-                                        "&client_secret=" + properties.getClientSecret() +
-                                        "&audience=" + properties.getAudience()
-                        )
+                        .body(Map.of(
+                                "grant_type", "client_credentials",
+                                "client_id", properties.getClientId(),
+                                "client_secret", properties.getClientSecret(),
+                                "audience", properties.getAudience()
+                        ))
                         .retrieve()
                         .body(Auth0TokenResponse.class)
                 ).accessToken();
