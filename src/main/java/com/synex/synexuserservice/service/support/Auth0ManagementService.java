@@ -5,9 +5,11 @@ import com.synex.synexuserservice.config.Auth0ManagementProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -45,18 +47,18 @@ public class Auth0ManagementService {
 
     private String getManagementToken() {
         return Objects.requireNonNull(auth0ManagementRestClient
-                        .post()
-                        .uri("/oauth/token")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .body(Map.of(
-                                "grant_type", "client_credentials",
-                                "client_id", properties.getClientId(),
-                                "client_secret", properties.getClientSecret(),
-                                "audience", properties.getAudience()
-                        ))
-                        .retrieve()
-                        .body(Auth0TokenResponse.class)
-                ).accessToken();
+                .post()
+                .uri("/oauth/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(new LinkedMultiValueMap<>(Map.of(
+                        "grant_type", List.of("client_credentials"),
+                        "client_id", List.of(properties.getClientId()),
+                        "client_secret", List.of(properties.getClientSecret()),
+                        "audience", List.of(properties.getAudience())
+                )))
+                .retrieve()
+                .body(Auth0TokenResponse.class)
+        ).accessToken();
     }
 
     private record Auth0TokenResponse(
