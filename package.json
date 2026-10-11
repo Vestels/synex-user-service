@@ -2,7 +2,9 @@
   "name": "synex-user-service",
   "version": "0.1.3",
   "private": true,
+  "type": "module",
   "scripts": {
+    "commitlint": "commitlint --edit",
     "commit": "commit",
     "prepare": "husky"
   },
