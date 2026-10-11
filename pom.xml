@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.synex</groupId>
     <artifactId>synex-user-service</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.3-SNAPSHOT</version>
     <name>synex-user-service</name>
     <description>User service for Synex application</description>
     <url/>
